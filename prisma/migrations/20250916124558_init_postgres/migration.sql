@@ -1,13 +1,15 @@
 -- CreateTable
 CREATE TABLE "User" (
-    "id" TEXT NOT NULL PRIMARY KEY,
+    "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "stripeCustomerId" TEXT,
     "stripeSubscriptionId" TEXT,
     "plan" TEXT,
     "subscriptionTokens" INTEGER NOT NULL DEFAULT 0,
-    "purchasedTokens" INTEGER NOT NULL DEFAULT 0
+    "purchasedTokens" INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
