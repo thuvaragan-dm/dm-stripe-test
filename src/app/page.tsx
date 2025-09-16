@@ -2,11 +2,11 @@
 import { useState } from 'react'
 import { PLANS } from '@/config/plans'
 
-async function createCheckout(priceId: string, mode: 'subscription' | 'payment') {
+async function createCheckout(priceId: string, mode: 'subscription' | 'payment', email?: string) {
   const res = await fetch('/api/checkout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ priceId, mode }),
+    body: JSON.stringify({ priceId, mode, email }),
   })
   const data = await res.json()
   if (data.url) {
@@ -20,6 +20,7 @@ export default function Home() {
   const [buyTokens, setBuyTokens] = useState<string>('')
   const [deductTokens, setDeductTokens] = useState<string>('')
   const [me, setMe] = useState<{ name?: string; email?: string; subscriptionTokens?: number; purchasedTokens?: number; plan?: string | null } | null>(null)
+  const [email, setEmail] = useState<string>('')
 
   // Load user info for the table
   if (typeof window !== 'undefined' && !me) {
@@ -28,14 +29,29 @@ export default function Home() {
   return (
     <main style={{ maxWidth: 960, margin: '0 auto', padding: 24 }}>
       <h1 style={{ fontSize: 32, fontWeight: 700, marginBottom: 8 }}>Pricing</h1>
-      <p style={{ color: '#6b7280', marginBottom: 24 }}>Choose a plan. Tokens are included each billing cycle.</p>
+      <p style={{ color: '#6b7280', marginBottom: 8 }}>Choose a plan. Tokens are included each billing cycle.</p>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 16 }}>
+        <input
+          type="email"
+          placeholder="Enter your email for checkout"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          style={{ padding: 8, border: '1px solid #e5e7eb', borderRadius: 8, flex: 1 }}
+        />
+        <button
+          style={{ background: '#e5e7eb', color: '#111827', border: 0, borderRadius: 8, padding: '10px 14px', cursor: 'pointer' }}
+          onClick={() => setEmail(me?.email || '')}
+        >
+          Use my saved email
+        </button>
+      </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 16 }}>
         {Object.entries(PLANS).map(([key, plan]) => (
           <div key={key} style={{ border: '1px solid #e5e5e5', borderRadius: 12, padding: 20, background: '#ffffff', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <h3 style={{ fontSize: 18, fontWeight: 600 }}>{plan.label}</h3>
             <p style={{ fontSize: 28, margin: '8px 0', fontWeight: 700 }}>${plan.priceUsd}/{plan.billingInterval}</p>
             <p style={{ marginTop: 4, color: '#6b7280' }}>{plan.tokensPerCycle} tokens per cycle</p>
-            <button style={{ marginTop: 12, background: '#111827', color: '#fff', border: 0, borderRadius: 8, padding: '10px 14px', cursor: 'pointer' }} onClick={() => createCheckout(plan.stripePriceId, 'subscription')}>Subscribe</button>
+            <button style={{ marginTop: 12, background: '#111827', color: '#fff', border: 0, borderRadius: 8, padding: '10px 14px', cursor: 'pointer' }} onClick={() => createCheckout(plan.stripePriceId, 'subscription', email || me?.email)} disabled={!((email || me?.email) && (email || me?.email)?.includes('@'))}>Subscribe</button>
           </div>
         ))}
       </div>

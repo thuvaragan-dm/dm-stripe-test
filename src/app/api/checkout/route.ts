@@ -5,17 +5,23 @@ import { getOrCreateHardcodedUser } from '@/lib/user'
 
 export async function POST(req: NextRequest) {
   try {
-    const { priceId, mode, topUpTokens } = await req.json()
+    const { priceId, mode, topUpTokens, email } = await req.json()
     if (!mode || !['subscription', 'payment'].includes(mode)) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
 
     const user = await getOrCreateHardcodedUser()
 
+    // Use provided email if valid, else fall back to stored
+    const normalizedEmail = typeof email === 'string' && email.includes('@') ? email.trim() : user.email
+    if (normalizedEmail !== user.email) {
+      await prisma.user.update({ where: { id: user.id }, data: { email: normalizedEmail } })
+    }
+
     let stripeCustomerId = user.stripeCustomerId
     if (!stripeCustomerId) {
       const customer = await stripe.customers.create({
-        email: user.email,
+        email: normalizedEmail,
         name: user.name,
         metadata: { userId: user.id },
       })
@@ -24,6 +30,11 @@ export async function POST(req: NextRequest) {
         where: { id: user.id },
         data: { stripeCustomerId },
       })
+    } else {
+      // Ensure Stripe customer email matches selected email
+      try {
+        await stripe.customers.update(stripeCustomerId, { email: normalizedEmail })
+      } catch {}
     }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
