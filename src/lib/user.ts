@@ -20,4 +20,18 @@ export async function getOrCreateHardcodedUser() {
   return user
 }
 
+export async function getOrCreateUserByEmail(email: string, name?: string) {
+  const normalized = email.trim().toLowerCase()
+  let user = await prisma.user.findUnique({ where: { email: normalized } })
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        email: normalized,
+        name: name && name.trim() ? name.trim() : normalized.split('@')[0],
+      },
+    })
+  }
+  return user
+}
+
 

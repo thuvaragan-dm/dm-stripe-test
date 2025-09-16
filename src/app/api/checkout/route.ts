@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
-import { getOrCreateHardcodedUser } from '@/lib/user'
+import { getOrCreateHardcodedUser, getOrCreateUserByEmail } from '@/lib/user'
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,10 +10,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 })
     }
 
-    const user = await getOrCreateHardcodedUser()
+    const candidateEmail = typeof email === 'string' && email.includes('@') ? email.trim() : undefined
+    const user = candidateEmail
+      ? await getOrCreateUserByEmail(candidateEmail)
+      : await getOrCreateHardcodedUser()
 
     // Use provided email if valid, else fall back to stored
-    const normalizedEmail = typeof email === 'string' && email.includes('@') ? email.trim() : user.email
+    const normalizedEmail = candidateEmail || user.email
     if (normalizedEmail !== user.email) {
       await prisma.user.update({ where: { id: user.id }, data: { email: normalizedEmail } })
     }
