@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
-import { findPlanByPriceId, TOP_UP } from '@/config/plans'
+import { findPlanByPriceId } from '@/config/plans'
 import type Stripe from 'stripe'
 
 export const config = {

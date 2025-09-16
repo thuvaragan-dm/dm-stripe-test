@@ -1,6 +1,5 @@
 "use client"
 import { useEffect, useState } from 'react'
-import { TOP_UP } from '@/config/plans'
 
 type Balances = { subscriptionTokens: number; purchasedTokens: number; plan?: string | null }
 

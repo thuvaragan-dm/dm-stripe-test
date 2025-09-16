@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,10 @@ export default function RootLayout({
       >
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '24px' }}>
           <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-            <a href="/" style={{ fontWeight: 700, fontSize: 18, color: '#111827', textDecoration: 'none' }}>Stripe Tokens</a>
+            <Link href="/" style={{ fontWeight: 700, fontSize: 18, color: '#111827', textDecoration: 'none' }}>Stripe Tokens</Link>
             <nav style={{ display: 'flex', gap: 12 }}>
-              <a href="/" style={{ color: '#111827', textDecoration: 'none' }}>Pricing</a>
-              <a href="/dashboard" style={{ color: '#111827', textDecoration: 'none' }}>Dashboard</a>
+              <Link href="/" style={{ color: '#111827', textDecoration: 'none' }}>Pricing</Link>
+              <Link href="/dashboard" style={{ color: '#111827', textDecoration: 'none' }}>Dashboard</Link>
             </nav>
           </header>
           {children}
