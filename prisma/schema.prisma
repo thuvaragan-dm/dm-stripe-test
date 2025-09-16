@@ -1,0 +1,25 @@
+// Prisma schema for SQLite
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                   String  @id @default(cuid())
+  email                String  @unique
+  name                 String
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String? @unique
+  plan                 String?
+  subscriptionTokens   Int     @default(0)
+  purchasedTokens      Int     @default(0)
+
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
+}
+
+
